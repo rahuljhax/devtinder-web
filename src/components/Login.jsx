@@ -5,8 +5,12 @@ import { addUser } from "../utils/userSlice";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
 const Login = () => {
-  const [emailId, setEmailId] = useState("rahul@gmail.com");
-  const [password, setPassword] = useState("Rahul@123");
+  const [emailId, setEmailId] = useState("");
+  const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [error, setError] = useState("");
+  const [isLoginForm, setIsLoginForm] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const loginHandler = async () => {
@@ -22,15 +26,61 @@ const Login = () => {
       dispatch(addUser(res.data));
       return navigate("/");
     } catch (err) {
-      console.log(err.message);
+      setError(err?.response?.data?.message || "Something went wrong");
     }
   };
+
+  const singupHandler = async () => {
+    try {
+      const res = await axios.post(
+        `${BASE_URL}/signup`,
+        {
+          firstName,
+          lastName,
+          emailId,
+          password,
+        },
+        { withCredentials: true }
+      );
+      dispatch(addUser(res?.data?.data));
+      navigate("/profile");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <>
       <div className="flex justify-center align-items-center my-10">
         <div className="card bg-base-300 w-96 shadow-xl">
           <div className="card-body">
             <h2 className="card-title justify-center">Login</h2>
+            {!isLoginForm && (
+              <>
+                <label className="input input-bordered flex items-center gap-2 my-1">
+                  <input
+                    value={firstName}
+                    onChange={(e) => {
+                      setFirstName(e.target.value);
+                    }}
+                    type="text"
+                    className="grow"
+                    placeholder="First Name"
+                  />
+                </label>
+                <label className="input input-bordered flex items-center gap-2 my-1">
+                  <input
+                    value={lastName}
+                    onChange={(e) => {
+                      setLastName(e.target.value);
+                    }}
+                    type="text"
+                    className="grow"
+                    placeholder="Last Name"
+                  />
+                </label>
+              </>
+            )}
             <label className="input input-bordered flex items-center gap-2 my-1">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -69,16 +119,30 @@ const Login = () => {
                 onChange={(e) => {
                   setPassword(e.target.value);
                 }}
-                type="password"
+                type="text"
                 className="grow"
                 placeholder="Password"
               />
             </label>
+            {error && <p className="text-red-500 text-center">{error}</p>}
             <div className="card-actions justify-center">
-              <button className="btn btn-primary" onClick={loginHandler}>
-                Login
+              <button
+                className="btn btn-primary"
+                onClick={isLoginForm ? loginHandler : singupHandler}
+              >
+                {isLoginForm ? "Login" : "Signup"}
               </button>
             </div>
+            <p
+              onClick={() => {
+                setIsLoginForm(!isLoginForm);
+              }}
+              className="text-center cursor-pointer my-2 text-blue-500"
+            >
+              {isLoginForm
+                ? "Existing User? Login here"
+                : "New User? Signup here"}
+            </p>
           </div>
         </div>
       </div>

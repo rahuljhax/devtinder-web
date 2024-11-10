@@ -3,7 +3,7 @@ const Footer = () => {
     <>
       <footer
         data-theme="dark"
-        className="footer bg-neutral text-neutral-content items-center p-4 fixed bottom-0"
+        className="footer bg-neutral text-neutral-content items-center p-4"
       >
         <aside className="grid-flow-col items-center">
           <svg
